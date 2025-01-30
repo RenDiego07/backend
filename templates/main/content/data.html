@@ -1,3 +1,5 @@
+{% load static %}
+
 <main class="h-full overflow-y-auto">
   <div class="container px-6 mx-auto grid">
     <h2
@@ -52,7 +54,7 @@
           <p
             class="text-lg font-semibold text-gray-700 dark:text-gray-200">
             <!-- START - first_responses -->
-            YYY
+            {{first_response}}
             <!-- END - first_responses -->
           </p>
         </div>
@@ -75,7 +77,7 @@
           <p
             class="text-lg font-semibold text-gray-700 dark:text-gray-200">
             <!-- START - last_responses -->
-            ZZZ
+            {{last_response}}
             <!-- END - last_responses -->
           </p>
         </div>
@@ -100,7 +102,7 @@
           <p
             class="text-lg font-semibold text-gray-700 dark:text-gray-200">
             <!-- START - high_rate_responses -->
-            VVV
+            {{high_rate_responses}}
             <!-- END - high_rate_responses -->
           </p>
         </div>

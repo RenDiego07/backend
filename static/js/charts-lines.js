@@ -4,38 +4,19 @@
 const lineConfig = {
   type: 'line',
   data: {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    labels: [],
     datasets: [
       {
-        label: 'Organic',
-        /**
-         * These colors come from Tailwind CSS palette
-         * https://tailwindcss.com/docs/customizing-colors/#default-color-palette
-         */
+        label: 'Solicitudes por mes',
         backgroundColor: '#0694a2',
         borderColor: '#0694a2',
-        data: [43, 48, 40, 54, 67, 73, 70],
+        data: [],
         fill: false,
-      },
-      {
-        label: 'Paid',
-        fill: false,
-        /**
-         * These colors come from Tailwind CSS palette
-         * https://tailwindcss.com/docs/customizing-colors/#default-color-palette
-         */
-        backgroundColor: '#7e3af2',
-        borderColor: '#7e3af2',
-        data: [24, 50, 64, 74, 52, 51, 65],
       },
     ],
   },
   options: {
     responsive: true,
-    /**
-     * Default legends are ugly and impossible to style.
-     * See examples in charts.html to add your own legends
-     *  */
     legend: {
       display: false,
     },
@@ -52,20 +33,65 @@ const lineConfig = {
         display: true,
         scaleLabel: {
           display: true,
-          labelString: 'Month',
+          labelString: 'Mes',
         },
       },
       y: {
         display: true,
         scaleLabel: {
           display: true,
-          labelString: 'Value',
+          labelString: 'Cantidad de Solicitudes',
         },
       },
     },
   },
 }
 
-// change this to the id of your chart element in HMTL
-const lineCtx = document.getElementById('line')
-window.myLine = new Chart(lineCtx, lineConfig)
+// Función para contar las solicitudes por mes
+function countRequestsByMonth(data) {
+  let counts = {};
+  let months = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+    "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+  ];
+
+  Object.values(data).forEach(entry => {
+    if (entry.saved) {
+      let dateParts = entry.saved.split(',')[0].trim().split('/'); // Extraer la fecha
+      let monthIndex = parseInt(dateParts[1], 10) - 1; // Convertir a índice del mes
+      let monthName = months[monthIndex];
+
+      counts[monthName] = (counts[monthName] || 0) + 1;
+    }
+  });
+
+  return {
+    labels: Object.keys(counts),
+    counts: Object.values(counts),
+  };
+}
+
+// Fetch data y actualizar el gráfico
+function updateLineChart() {
+  fetch('/api/v1/landing')
+    .then(response => response.json())
+    .then(data => {
+      let { labels, counts } = countRequestsByMonth(data);
+
+      console.log("Labels recibidos:", labels);
+      console.log("Counts recibidos:", counts);
+
+      // Actualizar el gráfico
+      window.myLine.data.labels = labels;
+      window.myLine.data.datasets[0].data = counts;
+      window.myLine.update();
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Crear el gráfico de líneas
+const lineCtx = document.getElementById('line');
+window.myLine = new Chart(lineCtx, lineConfig);
+
+// Llamar a la función de actualización
+updateLineChart();
